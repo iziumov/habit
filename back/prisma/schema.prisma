@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  username     String
+  password     String
+  refreshToken String?    @map("refresh_token")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  habits       Habit[]
+  logs         HabitLog[]
+
+  @@map("users")
+}
+
+model Habit {
+  id          String     @id @default(uuid())
+  userId      String
+  title       String
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  
+  user User     @relation(fields: [userId], references: [id])
+  logs HabitLog[]
+
+  @@map("habits")
+}
+
+model HabitLog {
+  id        String   @id @default(uuid())
+  habitId   String
+  userId    String
+  date      DateTime @default(now())
+  done Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id])
+  habit   Habit   @relation(fields: [habitId], references: [id])
+
+  @@unique([habitId, date])
+  @@map("habit_logs")
+}
