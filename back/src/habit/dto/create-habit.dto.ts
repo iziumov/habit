@@ -1,5 +1,6 @@
 export class CreateHabitDto {
-  habitId: string;
+  title: string;
+  description?: string;
   date: Date;
   completed: boolean;
   value?: number;
